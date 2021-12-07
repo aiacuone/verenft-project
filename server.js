@@ -1,6 +1,6 @@
 const express = require('express')
-const cors = require('cors')
 var jwt = require('jsonwebtoken')
+const cors = require('cors')
 
 const app = express()
 const port = 5000
@@ -16,29 +16,27 @@ const collections = {
   ],
 }
 
-const users = {}
 const TOKEN_SECRET = 'adrianssecret'
 
 const verifyTokenMiddleware = (req, res, next) => {
-  jwt.verify(req.body.token, TOKEN_SECRET, (err) => {
+  jwt.verify(req.headers['authorization'], TOKEN_SECRET, (err) => {
     if (err) {
-      throw new Error('TOKEN ERROR')
+      return res.json({
+        error: 'INVALID TOKEN',
+      })
     }
-
     next()
   })
 }
 
 app.use(express.json())
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
 app.get('/token', (req, res) => {
   // Sign the token
   var token = jwt.sign({ foo: 'bar' }, TOKEN_SECRET)
-  res.send(token)
+  res.json({
+    token: token,
+  })
 })
 
 app.get('/options', verifyTokenMiddleware, (req, res) => {
@@ -46,11 +44,9 @@ app.get('/options', verifyTokenMiddleware, (req, res) => {
 })
 
 app.post('/create', verifyTokenMiddleware, (req, res) => {
-  res.send('Create')
+  // console.log(req.body, 'response in server')
+  console.log('response in server')
 })
-
-//create an NFT
-app.post('/user', (req, res) => {})
 
 app.listen(port, () => {
   console.log(`Listening to port ${port}`)

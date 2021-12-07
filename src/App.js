@@ -4,11 +4,16 @@ import { makeStyles } from '@mui/styles'
 import './App.css'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
-import { useAuth0 } from '@auth0/auth0-react'
+import MenuItem from '@mui/material/MenuItem'
 
 function App() {
   const [collections, setCollections] = useState(null)
-  const [inputs, setInputs] = useState({ username: '', password: '' })
+  const [inputs, setInputs] = useState({
+    name: '',
+    description: '',
+    collection: '',
+    artist: '',
+  })
 
   const useStyles = makeStyles({
     root: {
@@ -29,26 +34,33 @@ function App() {
   const classes = useStyles()
 
   useEffect(() => {
-    fetchData()
+    fetchToken().then((token) => {
+      fetchData(token)
+    })
   }, [])
 
-  async function fetchData() {
+  async function fetchToken() {
     try {
-      const res = await fetch('http://localhost:5000/options')
+      const res = await fetch('http://localhost:5000/token')
       const data = await res.json()
-      setCollections(data.collections)
+      return data.token
     } catch (err) {
       console.log(err)
     }
   }
 
-  const LoginButton = () => {
-    const { loginWithRedirect } = useAuth0()
-    return <button onClick={loginWithRedirect}>LOG IN</button>
-  }
-
-  const logoutButton = () => {
-    // return <button onClick={}></button>
+  async function fetchData(token) {
+    try {
+      const res = await fetch('http://localhost:5000/options', {
+        headers: {
+          authorization: token,
+        },
+      })
+      const data = await res.json()
+      setCollections(data.collections)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   return (
@@ -58,10 +70,10 @@ function App() {
       justifyContent="center"
       alignItems="center">
       <Paper className={classes.mainContainer}>
-        {/* <LoginButton /> */}
         <Grid className={classes.container1}>
           <Grid container justifyContent="center" alignItems="center">
             <TextField
+              onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
               className={classes.textField}
               label="Name of NFT"
               id="filled-size-normal"
@@ -69,17 +81,30 @@ function App() {
               variant="filled"
             />
             <TextField
+              onChange={(e) =>
+                setInputs({ ...inputs, collection: e.target.value.label })
+              }
+              value={inputs.collection}
               className={classes.textField}
-              label="Size"
-              id="filled-size-normal"
-              defaultValue="Normal"
-              variant="filled"
-            />
+              id="outlined-select-currency"
+              select
+              label="Collection"
+              variant="filled">
+              {collections &&
+                collections.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+            </TextField>
           </Grid>
         </Grid>
         <Grid className={classes.container2}>
           <Grid container justifyContent="center">
             <TextField
+              onChange={(e) =>
+                setInputs({ ...inputs, description: e.target.value })
+              }
               className={classes.textField}
               id="NFT Description"
               label="NFT Description"
@@ -89,6 +114,7 @@ function App() {
               variant="filled"
             />
             <TextField
+              onChange={(e) => setInputs({ ...inputs, artist: e.target.value })}
               className={classes.textField}
               label="Artist"
               id="filled-size-normal"
@@ -96,6 +122,27 @@ function App() {
               variant="filled"
             />
           </Grid>
+        </Grid>
+        <Grid container justifyContent="center">
+          <button
+            onClick={() => {
+              // console.log(inputs)
+              try {
+                fetch('http://localhost:5000/create', {
+                  method: 'POST',
+                  body: JSON.stringify(inputs),
+                  // body: inputs,
+                  headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                  },
+                })
+              } catch (err) {
+                console.log(err)
+              }
+            }}>
+            Create
+          </button>
         </Grid>
       </Paper>
     </Grid>
