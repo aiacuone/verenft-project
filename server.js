@@ -5,6 +5,7 @@ const cors = require('cors')
 const app = express()
 const port = 5000
 
+app.use(express.json())
 app.use(cors())
 
 const collections = {
@@ -29,8 +30,6 @@ const verifyTokenMiddleware = (req, res, next) => {
   })
 }
 
-app.use(express.json())
-
 app.get('/token', (req, res) => {
   // Sign the token
   var token = jwt.sign({ foo: 'bar' }, TOKEN_SECRET)
@@ -45,7 +44,7 @@ app.get('/options', verifyTokenMiddleware, (req, res) => {
 
 app.post('/create', verifyTokenMiddleware, (req, res) => {
   // console.log(req.body, 'response in server')
-  console.log('response in server')
+  console.log('Create', req.body)
 })
 
 app.listen(port, () => {

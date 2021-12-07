@@ -6,6 +6,7 @@ import Paper from '@mui/material/Paper'
 
 function App() {
   const [collections, setCollections] = useState(null)
+  const [token, setToken] = useState('')
   const [inputs, setInputs] = useState({
     name: '',
     description: '',
@@ -41,6 +42,7 @@ function App() {
   useEffect(() => {
     fetchToken().then((token) => {
       fetchData(token)
+      setToken(token)
     })
   }, [])
 
@@ -52,6 +54,18 @@ function App() {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  async function postDetails(token, inputs) {
+    console.log('inputs', inputs)
+    await fetch('http://localhost:5000/create', {
+      method: 'POST',
+      headers: {
+        authorization: token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(inputs),
+    })
   }
 
   async function fetchData(token) {
@@ -133,20 +147,7 @@ function App() {
           <button
             className={classes.button}
             onClick={() => {
-              console.log(inputs)
-              try {
-                fetch('http://localhost:5000/create', {
-                  method: 'POST',
-                  body: JSON.stringify(inputs),
-                  // body: inputs,
-                  headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                  },
-                })
-              } catch (err) {
-                console.log(err)
-              }
+              postDetails(token, inputs)
             }}>
             Create
           </button>
