@@ -3,8 +3,6 @@ import Grid from '@mui/material/Grid'
 import { makeStyles } from '@mui/styles'
 import './App.css'
 import Paper from '@mui/material/Paper'
-import TextField from '@mui/material/TextField'
-import MenuItem from '@mui/material/MenuItem'
 
 function App() {
   const [collections, setCollections] = useState(null)
@@ -29,7 +27,14 @@ function App() {
       width: '100%',
       padding: '20px',
     },
-    textField: { width: '40%' },
+    textField: {
+      width: '40%',
+      margin: '10px',
+      width: '300px',
+      marginRight: '50px',
+    },
+    button: { margin: '20px' },
+    select: { margin: '10px' },
   })
   const classes = useStyles()
 
@@ -72,61 +77,63 @@ function App() {
       <Paper className={classes.mainContainer}>
         <Grid className={classes.container1}>
           <Grid container justifyContent="center" alignItems="center">
-            <TextField
-              onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
-              className={classes.textField}
-              label="Name of NFT"
-              id="filled-size-normal"
-              defaultValue="Enter Name"
-              variant="filled"
-            />
-            <TextField
-              onChange={(e) =>
-                setInputs({ ...inputs, collection: e.target.value.label })
-              }
-              value={inputs.collection}
-              className={classes.textField}
-              id="outlined-select-currency"
-              select
-              label="Collection"
-              variant="filled">
-              {collections &&
-                collections.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-            </TextField>
+            <label>
+              Name of NFT
+              <input
+                onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
+                type="text"
+                className={classes.textField}
+                placeholder="Enter the Name"
+              />
+            </label>
+            <label className={classes.label}>
+              Collection
+              <select
+                className={classes.select}
+                onChange={(e) =>
+                  setInputs({ ...inputs, collection: e.target.value })
+                }>
+                {collections &&
+                  collections.map((option) => (
+                    <option key={option} value={option.label}>
+                      {option.label}
+                    </option>
+                  ))}
+              </select>
+            </label>
           </Grid>
         </Grid>
         <Grid className={classes.container2}>
           <Grid container justifyContent="center">
-            <TextField
-              onChange={(e) =>
-                setInputs({ ...inputs, description: e.target.value })
-              }
-              className={classes.textField}
-              id="NFT Description"
-              label="NFT Description"
-              multiline
-              rows={4}
-              defaultValue="Enter Description"
-              variant="filled"
-            />
-            <TextField
-              onChange={(e) => setInputs({ ...inputs, artist: e.target.value })}
-              className={classes.textField}
-              label="Artist"
-              id="filled-size-normal"
-              defaultValue="Enter Artist Name"
-              variant="filled"
-            />
+            <label>
+              NFT Description
+              <input
+                onChange={(e) =>
+                  setInputs({ ...inputs, description: e.target.value })
+                }
+                type="text"
+                className={classes.textField}
+                placeholder="Enter Description"
+              />
+            </label>
+            <label>
+              Artist
+              <input
+                onChange={(e) =>
+                  setInputs({ ...inputs, artist: e.target.value })
+                }
+                type="text"
+                className={classes.textField}
+                placeholder="Enter Artist Name"
+              />
+            </label>
           </Grid>
         </Grid>
         <Grid container justifyContent="center">
           <button
+            className={classes.button}
             onClick={() => {
-              // console.log(inputs)
+              console.log(inputs)
               try {
                 fetch('http://localhost:5000/create', {
                   method: 'POST',
