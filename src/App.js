@@ -57,7 +57,6 @@ function App() {
   }
 
   async function postDetails(token, inputs) {
-    console.log('inputs', inputs)
     await fetch('http://localhost:5000/create', {
       method: 'POST',
       headers: {
@@ -81,6 +80,10 @@ function App() {
       console.log(err)
     }
   }
+
+  const disableButton = Object.values(inputs).every((input) => input.length > 0)
+    ? false
+    : true
 
   return (
     <Grid
@@ -107,6 +110,7 @@ function App() {
                 onChange={(e) =>
                   setInputs({ ...inputs, collection: e.target.value })
                 }>
+                <option></option>
                 {collections &&
                   collections.map((option) => (
                     <option key={option} value={option.label}>
@@ -145,6 +149,7 @@ function App() {
         </Grid>
         <Grid container justifyContent="center">
           <button
+            disabled={disableButton}
             className={classes.button}
             onClick={() => {
               postDetails(token, inputs)
